@@ -1,9 +1,5 @@
 package billing.billing_app.controller.security;
 
-<<<<<<< Updated upstream
-public class AuthController {
-
-=======
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
@@ -23,6 +19,7 @@ import billing.billing_app.dto.security.SignUpRequestDto;
 import billing.billing_app.dto.security.SignUpResponseDto;
 import billing.billing_app.exceptions.SessionNotFoundException;
 import billing.billing_app.service.security.securityService.AuthService;
+
 
 @RestController
 @RequestMapping("/auth")
@@ -82,6 +79,7 @@ public class AuthController {
         return authService.validate(token);
     }
 
+
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -97,5 +95,5 @@ public class AuthController {
         }
     }
 
->>>>>>> Stashed changes
+
 }

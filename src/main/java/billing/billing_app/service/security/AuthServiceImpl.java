@@ -7,12 +7,16 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+
 import billing.billing_app.exceptions.SessionNotFoundException;
+
 import billing.billing_app.exceptions.UserAlreadyExists;
 import billing.billing_app.exceptions.UserNotFoundException;
 import billing.billing_app.exceptions.WrongPasswordException;
 import billing.billing_app.model.Session;
+
 import billing.billing_app.model.SessionStatus;
+
 import billing.billing_app.model.User;
 import billing.billing_app.repository.SessionRepository;
 import billing.billing_app.repository.UserRepository;
@@ -75,7 +79,9 @@ public class AuthServiceImpl implements AuthService {
             calendar.add(Calendar.DAY_OF_MONTH, 30);
             Date datePlus30Days = calendar.getTime();
             session.setExpiringAt(datePlus30Days);
+
             session.setSessionStatus(SessionStatus.ACTIVE);
+
             sessionRepository.save(session);
 
             return token;
@@ -126,6 +132,7 @@ public class AuthServiceImpl implements AuthService {
 
         return true;
     }
+
 
     @Override
     public void logout(String token) {

@@ -7,7 +7,9 @@ import billing.billing_app.exceptions.UserAlreadyExists;
 import billing.billing_app.exceptions.UserNotFoundException;
 import billing.billing_app.mapper.BillingMapper;
 import billing.billing_app.model.BillingEntity;
+import billing.billing_app.model.User;
 import billing.billing_app.repository.CreateAcctRepository;
+import billing.billing_app.repository.UserRepository;
 import billing.billing_app.service.serviceInterface.CreateAccountService;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,13 +25,16 @@ public class CreateAcctServiceImpl implements CreateAccountService {
     private CreateAcctRepository createAcctRepo;
     private BillingMapper billingMapper;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private UserRepository userRepository;
 
     public CreateAcctServiceImpl(CreateAcctRepository createAcctRepo,
             BillingMapper billingMapper,
-            BCryptPasswordEncoder bCryptPasswordEncoder) {
+            BCryptPasswordEncoder bCryptPasswordEncoder,
+            UserRepository userRepository) {
         this.createAcctRepo = createAcctRepo;
         this.billingMapper = billingMapper;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -41,8 +46,13 @@ public class CreateAcctServiceImpl implements CreateAccountService {
             throw new UserAlreadyExists("User with " + existingUser + " already exists");
         }
 
+        User user = new User();
+        user.setEmail(requestDto.getEmail());
+        user.setPassword(bCryptPasswordEncoder.encode(requestDto.getPassword()));
+        userRepository.save(user);
+
         BillingEntity billing = billingMapper.toEntity(requestDto);
-        billing.setPassword(bCryptPasswordEncoder.encode(requestDto.getPassword()));
+        billing.setUser(user);
         createAcctRepo.save(billing);
         return billingMapper.toResponseDto(billing);
     }
@@ -77,16 +87,15 @@ public class CreateAcctServiceImpl implements CreateAccountService {
         if (requestDto.getAddress() != null) {
             billingEntity.setAddress(requestDto.getAddress());
         }
+
+        User user = billingEntity.getUser();
+
         if (requestDto.getEmail() != null) {
-            billingEntity.setEmail(requestDto.getEmail());
-        }
-        if (requestDto.getName() != null) {
-            billingEntity.setName(requestDto.getName());
-        }
-        if (requestDto.getPhone() != null) {
-            billingEntity.setPhone(requestDto.getPhone());
+            user.setEmail(requestDto.getEmail());
+            userRepository.save(user); // Update email in User
         }
 
+        billingMapper.updateEntityFromDto(requestDto, billingEntity);
         createAcctRepo.save(billingEntity);
 
         return billingMapper.toResponseDto(billingEntity);

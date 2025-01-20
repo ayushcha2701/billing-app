@@ -1,4 +1,4 @@
-package billing.billing_app.dto;
+package billing.billing_app.dto.security;
 
 public enum RequestStatus {
     SUCCESS,
