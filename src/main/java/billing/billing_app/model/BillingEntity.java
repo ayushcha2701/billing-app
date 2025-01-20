@@ -1,7 +1,10 @@
 package billing.billing_app.model;
 
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.*;
 
 @Getter
@@ -13,9 +16,11 @@ import lombok.*;
 public class BillingEntity extends BaseModel {
 
    private String name;
-   private String email;
    private String phone;
    private String address;
-   private String password;
+
+   @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+   @JoinColumn(name = "user_id", referencedColumnName = "id")
+   private User user;
 
 }
