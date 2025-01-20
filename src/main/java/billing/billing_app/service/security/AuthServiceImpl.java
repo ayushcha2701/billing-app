@@ -7,10 +7,16 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+
+import billing.billing_app.exceptions.SessionNotFoundException;
+
 import billing.billing_app.exceptions.UserAlreadyExists;
 import billing.billing_app.exceptions.UserNotFoundException;
 import billing.billing_app.exceptions.WrongPasswordException;
 import billing.billing_app.model.Session;
+
+import billing.billing_app.model.SessionStatus;
+
 import billing.billing_app.model.User;
 import billing.billing_app.repository.SessionRepository;
 import billing.billing_app.repository.UserRepository;
@@ -74,6 +80,8 @@ public class AuthServiceImpl implements AuthService {
             Date datePlus30Days = calendar.getTime();
             session.setExpiringAt(datePlus30Days);
 
+            session.setSessionStatus(SessionStatus.ACTIVE);
+
             sessionRepository.save(session);
 
             return token;
@@ -123,6 +131,23 @@ public class AuthServiceImpl implements AuthService {
         }
 
         return true;
+    }
+
+
+    @Override
+    public void logout(String token) {
+
+        Optional<Session> sessionOptional = sessionRepository.findByToken(token);
+
+        if (sessionOptional.isPresent()) {
+
+            Session session = sessionOptional.get();
+            session.setSessionStatus(SessionStatus.ENDED);
+            sessionRepository.save(session);
+
+        } else {
+            throw new SessionNotFoundException("Session not found for the provided token.");
+        }
     }
 
 }

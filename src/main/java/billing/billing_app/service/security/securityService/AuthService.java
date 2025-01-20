@@ -11,4 +11,7 @@ public interface AuthService {
     public String login(String email, String password) throws UserNotFoundException, WrongPasswordException;
 
     public boolean validate(String token);
+
+    public void logout(String token);
+
 }
